@@ -1,0 +1,25 @@
+[package]
+edition = "2021"
+name = "xelicon"
+version = "0.0.0"
+publish = false
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "z"
+panic = "abort"
+strip = true
+
+[dependencies]
+itertools = { version = "0.10.5", default-features = false }
+panicking = "0.4.0"
+tuifw = { version = "0.1.0", path = "../tuifw" }
+tuifw-screen = { version = "0.18.2", path = "../tuifw/screen" }
+tuifw-window = { version = "0.18.2", path = "../tuifw/window" }
+unicode-normalization = { version = "0.1.22", default-features = false }
+unicode-segmentation = "1.10.0"
+unicode-width = "0.1.10"
