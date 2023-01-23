@@ -15,11 +15,14 @@ panic = "abort"
 strip = true
 
 [dependencies]
+components-arena = "3.4.2"
+iter-identify_first_last = "0.1.0"
 itertools = { version = "0.10.5", default-features = false }
+macro-attr-2018 = "2.1.2"
 panicking = "0.4.0"
 tuifw = { version = "0.1.0", path = "../tuifw" }
-tuifw-screen = { version = "0.18.2", path = "../tuifw/screen" }
-tuifw-window = { version = "0.18.2", path = "../tuifw/window" }
+tuifw-screen = { version = "0.19.0", path = "../tuifw/screen" }
+tuifw-window = { version = "0.19.0", path = "../tuifw/window" }
 unicode-normalization = { version = "0.1.22", default-features = false }
 unicode-segmentation = "1.10.0"
 unicode-width = "0.1.10"

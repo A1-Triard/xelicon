@@ -16,9 +16,9 @@ checksum = "a20104e2335ce8a659d6dd92a51a767a0c062599c73b343fd152cb401e828c3d"
 
 [[package]]
 name = "components-arena"
-version = "3.4.1"
+version = "3.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3dc609805d4464bdc23cd4bc110af4cace017b5cc6f283239396c29167ccd7a"
+checksum = "7645fa0350ec535916f845a77d12da13677e70d437eae8641a827d60c6b3f263"
 dependencies = [
  "components-arena-traits",
  "composable-allocators",
@@ -241,9 +241,9 @@ checksum = "21eb594cd667adf943bf4617e74ca71e2f4041f2fa630d5fc7be9314a1b480de"
 
 [[package]]
 name = "pc-ints"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a3a0755c74e18ec32220df0c2eddb6ef7970a079417e65f22a59710d8992dd1"
+checksum = "282404291842afd51a3f3ad2dc8dfd46519c152e8daeea49245390634f0244a2"
 dependencies = [
  "memoffset",
 ]
@@ -349,8 +349,9 @@ dependencies = [
 
 [[package]]
 name = "tuifw-screen"
-version = "0.18.2"
+version = "0.19.1"
 dependencies = [
+ "composable-allocators",
  "errno-no-std",
  "tuifw-screen-base",
  "tuifw-screen-dos",
@@ -360,7 +361,7 @@ dependencies = [
 
 [[package]]
 name = "tuifw-screen-base"
-version = "0.18.2"
+version = "0.19.1"
 dependencies = [
  "enum-derive-2018",
  "errno-no-std",
@@ -370,7 +371,7 @@ dependencies = [
 
 [[package]]
 name = "tuifw-screen-dos"
-version = "0.18.2"
+version = "0.19.1"
 dependencies = [
  "dos-cp",
  "either",
@@ -378,15 +379,17 @@ dependencies = [
  "panicking",
  "pc-ints",
  "tuifw-screen-base",
+ "unicode-width",
 ]
 
 [[package]]
 name = "tuifw-screen-ncurses"
-version = "0.18.2"
+version = "0.19.1"
 dependencies = [
  "cc",
  "either",
  "errno-no-std",
+ "itertools",
  "libc",
  "panicking",
  "pkg-config",
@@ -396,19 +399,20 @@ dependencies = [
 
 [[package]]
 name = "tuifw-screen-winapi"
-version = "0.18.2"
+version = "0.19.1"
 dependencies = [
  "either",
  "errno-no-std",
  "num-traits",
  "panicking",
  "tuifw-screen-base",
+ "unicode-width",
  "winapi",
 ]
 
 [[package]]
 name = "tuifw-window"
-version = "0.18.2"
+version = "0.19.1"
 dependencies = [
  "components-arena",
  "educe",
@@ -476,7 +480,10 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 name = "xelicon"
 version = "0.0.0"
 dependencies = [
+ "components-arena",
+ "iter-identify_first_last",
  "itertools",
+ "macro-attr-2018",
  "panicking",
  "tuifw",
  "tuifw-screen",

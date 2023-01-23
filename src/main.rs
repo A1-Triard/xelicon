@@ -3,8 +3,6 @@
 use tuifw_screen::{Bg, Event, Fg, Key, Point, Rect, Thickness, Vector};
 use tuifw_window::{RenderPort, Window, WindowTree};
 use tuifw::{RenderPortExt, WindowManager, WindowRenderer, WindowRendererState};
-use unicode_normalization::UnicodeNormalization;
-use unicode_segmentation::UnicodeSegmentation;
 
 mod text;
 use text::*;
@@ -12,49 +10,12 @@ use text::*;
 struct App {
     window_renderer: WindowRenderer<App>,
     text: Text,
+    view: TextView,
     cursor: Vector,
 }
 
 impl WindowRendererState for App {
     fn window_renderer(&self) -> &WindowRenderer<App> { &self.window_renderer }
-}
-
-fn control_char_map(c: char) -> char {
-    match c {
-        '\x00' => '\x00',
-        '\x01' => '☺',
-        '\x02' => '☻',
-        '\x03' => '♥',
-        '\x04' => '♦',
-        '\x05' => '♣',
-        '\x06' => '♠',
-        '\x07' => '•',
-        '\x08' => '◘',
-        '\x09' => '○',
-        '\x0A' => '┘', // '◙'
-        '\x0B' => '♂',
-        '\x0C' => '♀',
-        '\x0D' => '♪',
-        '\x0E' => '♫',
-        '\x0F' => '☼',
-  	'\x10' => '►',
-        '\x11' => '◄',
-        '\x12' => '↕',
-        '\x13' => '‼',
-        '\x14' => '¶',
-        '\x15' => '§',
-        '\x16' => '▬',
-        '\x17' => '↨',
-        '\x18' => '↑',
-        '\x19' => '↓',
-        '\x1A' => '→',
-        '\x1B' => '←',
-        '\x1C' => '∟',
-        '\x1D' => '↔',
-        '\x1E' => '▲',
-        '\x1F' => '▼',
-        c => c
-    }
 }
 
 fn render_window_1(
@@ -71,14 +32,16 @@ fn render_window_1(
     rp.bl_edge(bounds.bl_inner(), true, Fg::LightGray, Bg::Blue);
     rp.br_edge(bounds.br_inner(), true, Fg::LightGray, Bg::Blue);
     let text_bounds = Thickness::new(1, 0, 1, 1).shrink_rect(bounds);
-    app.text.resize((text_bounds.h() as u16).into());
-    let mut normalized_line = String::new();
-    for (n, line) in app.text.lines().enumerate() {
-        let line_len = line.grapheme_indices(true).take((text_bounds.w() as u16).into()).last().map_or(0, |(i, s)| i + s.len());
-        let line = &line[.. line_len];
-        normalized_line.clear();
-        line.nfc().map(control_char_map).collect_into(&mut normalized_line);
-        rp.out(Point { x: 1, y: u16::try_from(n).unwrap() as i16 }, Fg::LightGray, Bg::Blue, &normalized_line);
+    app.view.resize_lines((text_bounds.h() as u16).into(), &mut app.text);
+    let columns_start = app.view.columns(&app.text).start;
+    app.view.set_columns(columns_start .. columns_start.saturating_add((text_bounds.w() as u16).into()), &mut app.text);
+    app.view.prepare_display(&mut app.text);
+    for (n, line) in app.view.lines(&app.text).enumerate() {
+        let (padding, line) = app.view.display_line(line, &app.text);
+        rp.out(Point {
+            x: 1i16.wrapping_add(padding as u16 as i16),
+            y: u16::try_from(n).unwrap() as i16
+        }, Fg::LightGray, Bg::Blue, line);
     }
     if text_bounds.h() != 0 {
         rp.cursor(Point { x: 1, y: 0 }.offset(app.cursor));
@@ -90,16 +53,18 @@ fn window_1_bounds(screen_size: Vector) -> Rect {
 }
 
 fn main() {
-    let screen = unsafe { tuifw_screen::init() }.unwrap();
+    let screen = unsafe { tuifw_screen::init(None, None) }.unwrap();
     let windows = &mut WindowTree::new(screen, <WindowRenderer<App>>::render);
     let window_manager = &mut WindowManager::new();
     let mut window_renderer = WindowRenderer::new();
     let window_1 = window_manager.new_window(windows, None, None, window_1_bounds);
     window_renderer.add_window(window_1, windows, render_window_1);
+    let mut text = Text::new("Sim大ple text.\nLorem ip\x01\x02sum大.\n".into(), "\n".into());
+    let view = TextView::new(&mut text);
     let mut app = App {
         window_renderer,
-        text: Text::new("Sim大ple text.\nLorem ip\x01\x02sum大.\n".into(), "\n".into()),
         cursor: Vector { x: 0, y: 0 },
+        text, view,
     };
     windows.invalidate_screen();
     loop {
@@ -107,6 +72,7 @@ fn main() {
             window_manager.update(windows, event);
             if matches!(event, Event::Key(_, Key::Escape)) { break; }
             match event {
+                /*
                 Event::Key(n, Key::Char(c)) => {
                     for _ in 0 .. n.get() {
                         app.text.insert((app.cursor.y as u16).into(), (app.cursor.x as u16).into(), c);
@@ -159,6 +125,7 @@ fn main() {
                     }
                     window_1.invalidate(windows);
                 },
+                */
                 _ => { },
             };
         }
